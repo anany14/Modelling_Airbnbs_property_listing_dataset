@@ -187,6 +187,8 @@ if __name__ == "__main__":
     df = pd.read_csv("C:/Users/Anany/OneDrive/Desktop/Github/AIcore/Modelling_Airbnbs_property_listing_dataset/airbnb-property-listing/tabular_data/listing.csv")
     # Clean the data
     clean_df = clean_tabular_data(df)
-    #load_airbnb(clean_df,label='Price_Night')
     # Save the cleaned data to a new CSV file
     clean_df.to_csv("C:/Users/Anany/OneDrive/Desktop/Github/AIcore/Modelling_Airbnbs_property_listing_dataset/airbnb-property-listing/tabular_data/clean_listing.csv")
+    # printing features and labels
+    features,labels = load_airbnb(clean_df,label='Price_Night')
+    print("printing first 10 features and labels \n",features[:10],labels[:10])

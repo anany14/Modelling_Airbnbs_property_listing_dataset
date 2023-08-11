@@ -1,0 +1,5 @@
+{
+    "validation_rmse": 101.42040620181031,
+    "gridsearch_rmse": 99.59025019389185,
+    "validation_r2": 0.2161375942950876
+}
