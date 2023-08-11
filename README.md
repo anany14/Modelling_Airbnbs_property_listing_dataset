@@ -82,7 +82,7 @@ We'd like to acknowledge the following resources that have been instrumental in 
 
 This project aims to build a systematic framework for training, tuning, and evaluating machine learning models on various tasks, inspired by the challenges tackled by the Airbnb team. The framework will be designed to handle different types of data, including tabular, image, and text data. The goal is to create a flexible and reusable system that can be applied to any dataset.
 
-## Milestones
+### Milestones
 1. Set up the environment: Prepare the development environment to start building the framework.
 
 2. Data preparation: Understand the structure of the Airbnb dataset and perform data cleaning and preprocessing.
@@ -95,7 +95,7 @@ This project aims to build a systematic framework for training, tuning, and eval
 
 6. Reuse the framework for another use-case: Test the flexibility of the framework by applying it to a different dataset, ensuring that it can handle various data types.
 
-## Data Cleaning (tabular_data.py)
+### Data Cleaning (tabular_data.py)
 
 The `tabular_data.py` module contains functions for cleaning and preprocessing the Airbnb property listing dataset. The key steps include:
 
@@ -111,7 +111,7 @@ The `tabular_data.py` module contains functions for cleaning and preprocessing t
 
 6. **Cleaning Tabular Data:** The `clean_tabular_data` function applies a series of data cleaning steps, combining the above functions to obtain a cleaned DataFrame.
 
-## Regression Modeling (modelling.py)
+### Regression Modeling (modelling.py)
 
 The `modelling.py` module focuses on building and evaluating regression models to predict the price per night of the Airbnb property listings. The key steps include:
 
@@ -127,7 +127,7 @@ The `modelling.py` module focuses on building and evaluating regression models t
 
 6. **Finding the Best Model:** The `find_best_model` function identifies the best-performing model based on the saved validation RMSE values from the earlier model evaluations.
 
-## Model Selection and Metrics
+### Model Selection and Metrics
 
 In the file `modelling.py`, we evaluated several regression models:
 
@@ -147,33 +147,35 @@ The best model based on the validation RMSE is the chosen model for making predi
 
 2. **R-squared (R2) Score**: A measure of how well the model explains the variance in the target variable. Higher R2 score indicates a better fit to the data.
 
-## Model Performance Metrics 
+### Model Performance Metrics 
 
-**Linear Regression (SGDRegressor)**:
+- **Linear Regression (SGDRegressor)**:
     - best hyperparameters: {'alpha': 1e-05, 'max_iter': 1000, 'tol': 0.001}
     - gridsearch_rmse: 97.7362631514105
     - validation_rmse: 127.4768534817222
     - validation_r2: -0.23837397130168658
 
-**Decision Tree Regressor**:
+- **Decision Tree Regressor**:
     - best hyperparameters: {'max_depth': 5, 'min_samples_leaf': 10, 'min_samples_split': 2}
     - gridsearch_rmse: 99.83932831904127
     - validation_rmse: 104.07966226324588
     - validation_r2: 0.174492747038261
 
-**Random Forest Regressor**:
+- **Random Forest Regressor**:
     - best hyperparameters: {'max_depth': None, 'min_samples_leaf': 10, 'min_samples_split': 2, 'n_estimators': 300}
     - gridsearch_rmse: 93.53765214999888
     - validation_rmse: 101.63984683370312
     - validation_r2: 0.212741880233853
 
-**Gradient Boosting Regressor**:
+- **Gradient Boosting Regressor**:
     - best hyperparameters: {'learning_rate': 0.05, 'max_depth': 3, 'n_estimators': 300}
     - gridsearch_rmse: 102.7416140657607
     - validation_rmse: 107.80684569675182
     - validation_r2: 0.11430983256579175
 
-## Further Experiments
+- The best model to fit the data is `GradientBoostingRegressor(learning_rate=0.01, n_estimators=300, random_state=42)`
+
+### Further Experiments
 
 While we have explored a variety of regression models and performed hyperparameter tuning, there are several additional experiments we could consider:
 
