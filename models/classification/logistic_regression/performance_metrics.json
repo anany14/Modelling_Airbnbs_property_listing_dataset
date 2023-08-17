@@ -1,0 +1,7 @@
+{
+    "training_accuracy": 0.962050625430907,
+    "validation_accuracy": 0.9662921348314607,
+    "validation_precision": 0.9662921348314607,
+    "validaiton_recall": 0.9662921348314607,
+    "validation_f1": 0.9662921348314607
+}

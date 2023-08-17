@@ -178,7 +178,7 @@ def load_airbnb(df: pd.DataFrame, label: str) -> tuple[pd.DataFrame,pd.Series]:
     """
     labels = df[label]
     # Drop irrelevant columns (e.g., 'Category', 'ID', 'Title', 'Description', 'Amenities', 'Location', 'url') to get the features DataFrame
-    features = df.drop(columns=[label, 'Category', 'ID', 'Title', 'Description', 'Amenities', 'Location', 'url'])
+    features = df.drop(columns=[label,'Category', 'ID', 'Title', 'Description', 'Amenities', 'Location', 'url'])
     return features, labels
 
 
@@ -190,5 +190,5 @@ if __name__ == "__main__":
     # Save the cleaned data to a new CSV file
     clean_df.to_csv("C:/Users/Anany/OneDrive/Desktop/Github/AIcore/Modelling_Airbnbs_property_listing_dataset/airbnb-property-listing/tabular_data/clean_listing.csv")
     # printing features and labels
-    features,labels = load_airbnb(clean_df,label='Price_Night')
-    print("printing first 10 features and labels \n",features[:10],labels[:10])
+    #features,labels = load_airbnb(clean_df,label='Price_Night')
+    #print("printing first 10 features and labels \n",features[:10],labels[:10])
