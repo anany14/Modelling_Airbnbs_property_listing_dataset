@@ -10,8 +10,10 @@ from typing import List, Tuple, Dict, Type, Any
 import itertools
 import joblib
 import json
+import matplotlib.pyplot as plt
 import os
 import pandas as pd
+import numpy as np
 
 # Split dataset into training, testing, and validation sets
 def split_X_y(X:pd.DataFrame, y:pd.Series)->Tuple:
@@ -86,10 +88,9 @@ def train_regression_model(X_train:pd.DataFrame, y_train:pd.Series, X_test:pd.Da
 
     # Print the results
     print(f"Initial Training RMSE: {train_rmse} | Initial Training R-squared (R2): {train_r2}")
-    print(f"Initial Test RMSE: {test_rmse} | Initial Test R-squared (R2): {test_r2}")
+    print(f"Initial Test RMSE: {test_rmse} | Initial Test R-squared (R2): {test_r2}\n")
     # The outputs at this point suggest that there might be some issues with the model
     # Extreme high values of MSE and negative R-squared suggest that the model is not fitting well
-
 
 # Custom tune hyperparameters of a model and return the best model and metrics
 def custom_tune_regression_model_hyperparameters(model_class: type,X_train: pd.DataFrame,y_train: pd.Series,X_val: pd.DataFrame,y_val: pd.Series,hyperparameters: Dict[str, List]):
@@ -123,7 +124,7 @@ def custom_tune_regression_model_hyperparameters(model_class: type,X_train: pd.D
         hyperparam_dict = dict(zip(hyperparameters.keys(), hyperparam_values))
         model = model_class(**hyperparam_dict, random_state=42)
         model.fit(X_train, y_train)
-
+        # predicting y_validtion vaules to calculate validation rmse
         y_val_pred = model.predict(X_val)
         val_rmse = mean_squared_error(y_val, y_val_pred, squared=False)
 
@@ -134,9 +135,10 @@ def custom_tune_regression_model_hyperparameters(model_class: type,X_train: pd.D
             best_val_rmse = val_rmse
 
     # Train the best model on the full training and validation sets
-    # best_model.fit(pd.concat([X_train, X_val]), pd.concat([y_train, y_val]))
+    # Doing this because of data leakage for X_val and y_val
+    best_model.fit(pd.concat([X_train, X_val]), pd.concat([y_train, y_val]))
     # Train the best model on the training set 
-    best_model.fit(X_train,y_train)
+    # best_model.fit(X_train,y_train)
 
     # Calculate final training rmse
     final_train_pred = best_model.predict(X_train)
@@ -151,6 +153,7 @@ def custom_tune_regression_model_hyperparameters(model_class: type,X_train: pd.D
     # Store performance metrics
     performance_metrics = {"training_rmse": final_train_rmse,"training_r2":final_train_r2,"validation_rmse": final_val_rmse,"validation_r2":final_val_r2}
     return best_model, best_hyperparameters, performance_metrics
+
 
 # Tune hyperparameters of a model and return the best model and metrics
 def tune_regression_model_hyperparameters(model_class: type,X_train: pd.DataFrame,y_train: pd.Series,X_val : pd.DataFrame,y_val: pd.Series,
@@ -227,7 +230,9 @@ def save_model(model, hyperparameters, performance_metrics, folder='models/regre
 
     # Save model using joblib
     model_name = os.path.join(folder, 'model.joblib')
-    joblib.dump(model, model_name)
+    #joblib.dump(model, model_name)
+    joblib.dump(model, model_name, compress=('zlib', 3))
+
 
     # Save hyperparameters to a json file
     hyperparameters_name = os.path.join(folder, 'hyperparameters.json')
@@ -239,6 +244,30 @@ def save_model(model, hyperparameters, performance_metrics, folder='models/regre
     with open(performance_metrics_name, 'w') as f:
         json.dump(performance_metrics, f, indent=4)
 
+
+# Create scatter plot with line of best fit for regression models
+def plot_regression_results(y_actual, y_predicted, model_name):
+    """
+    
+    """
+    plt.figure(figsize=(8, 6))
+    
+    plt.scatter(y_actual, y_predicted, color='blue', alpha=0.5)
+    
+    # Fit a linear regression line to the scatter plot
+    slope, intercept = np.polyfit(y_actual, y_predicted, 1)
+    line_fit = slope * y_actual + intercept
+    
+    plt.plot(y_actual, line_fit, color='red')
+    
+    plt.title(f"Scatter Plot with Line of Best Fit ({model_name})")
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.tight_layout()
+    
+    plt.show()
+
+    
 
 def evaluate_all_models(X_train, y_train, X_val, y_val):
     """
@@ -281,31 +310,51 @@ def evaluate_all_models(X_train, y_train, X_val, y_val):
 
         None
     """
-
     # list of models to evaluate
     models_to_evaluate = [
-    ("LinearRegression", SGDRegressor, {
+    ("LinearRegression", SGDRegressor,{
+            'loss':  ['squared_error','huber','epsilon_insensitive','squared_epsilon_insensitive'],
+            'penalty' : ['l2', 'l1', 'elasticnet', None],
             "alpha": [1e-4, 1e-3, 1e-2, 1e-1],
-            "max_iter": [1000, 2000, 5000],
-            "tol": [1e-2, 1e-3, 1e-4]
+            "max_iter": [1000, 2000],
+            "tol": [1e-2, 1e-3, 1e-4],
+            "early_stopping": [True,False]
     }),
     ("DecisionTree", DecisionTreeRegressor, {
-            "max_depth": [5, 7, None],
-            "min_samples_split": [2, 5, 10],
-            "min_samples_leaf": [5, 10, 15]
+            "criterion" : ["squared_error", "friedman_mse", "absolute_error", "poisson"],
+            "splitter" : ["best", "random"],
+            "max_depth": [5, 2, None],
+            "min_samples_split": [2, 5, 7],
+            "min_samples_leaf": [1, 3, 5]
     }),
     ("RandomForest", RandomForestRegressor, {
-            "n_estimators": [300, 400, 500],
-            "max_depth": [None, 5, 10],
-            "min_samples_split": [2, 5, 10],
-            "min_samples_leaf": [5, 10, 15]
+            "criterion" : ["squared_error", "absolute_error", "friedman_mse", "poisson"],
+            "n_estimators": [100, 200, 400],
+            "max_depth": [None, 2, 5],
+            "min_samples_split": [2, 5, 7],
+            "min_samples_leaf": [1, 3, 5]
     }),
     ("GradientBoosting", GradientBoostingRegressor, {
-            "learning_rate": [0.001, 0.01, 0.1],
-            "max_depth": [3, 4, 5],
-            "n_estimators": [300, 400, 500]
+            "loss" : ['squared_error', 'absolute_error', 'huber', 'quantile'],
+            "learning_rate": [0.01, 0.1,1,10],
+            "max_depth": [3, 5, None],
+            "n_estimators": [100, 200, 300],
+            'alpha': [0.9,0.5,0.1]
     })]
 
+    # evaluating model using custom linear regression
+    for model_name,model,hyperparameters in models_to_evaluate:
+        print(f"Custom evaluating {model_name}...")
+        best_model,best_hyperparameters,performance_metrics = custom_tune_regression_model_hyperparameters(
+        model,X_train,y_train,X_val,y_val,hyperparameters)
+
+        #saving model
+        save_model(best_model,best_hyperparameters,performance_metrics,folder=f"models/regression/custom_{model_name.lower()}")
+        print(f"{model_name} Custom Evaluation Complete.")
+
+    print("\n")
+
+    # evluating using gridcv
     for model_name, model_class, hyperparameters in models_to_evaluate:
         print(f"Evaluating {model_name}...")
         best_model, best_hyperparameters, performance_metrics = tune_regression_model_hyperparameters(
@@ -314,10 +363,14 @@ def evaluate_all_models(X_train, y_train, X_val, y_val):
         # Save model, hyperparameters, and metrics
         model_folder = f"models/regression/{model_name.lower()}"
         save_model(best_model, best_hyperparameters, performance_metrics, folder=model_folder)
-        print(f"{model_name} evaluation complete.")
+        print(f"{model_name} Evaluation Complete.")
+
+    print("\n")
 
 
-def find_best_model():
+
+
+def find_best_model(X_test,y_test):
     """
     Find the best model based on the saved RMSE values from previously tuned models.
 
@@ -339,14 +392,14 @@ def find_best_model():
     models_to_evaluate = ["LinearRegression", "DecisionTree", "RandomForest", "GradientBoosting"]
 
     for model_name in models_to_evaluate:
-        print(f"Evaluating {model_name}...")
+        print(f"Checking {model_name}...")
         model_folder = f"models/regression/{model_name.lower()}"
         performance_metrics_path = os.path.join(model_folder, 'performance_metrics.json')
 
         with open(performance_metrics_path, 'r') as f:
             performance_metrics = json.load(f)
 
-        model_rmse = performance_metrics.get("validation_rmse", float("inf"))
+        model_rmse = performance_metrics.get("validation_rmse", float)
 
         if model_rmse < best_rmse:
             best_model = joblib.load(os.path.join(model_folder, 'model.joblib'))
@@ -356,8 +409,106 @@ def find_best_model():
             best_rmse = model_rmse
             model_name_string = f"{model_name}"
 
-    print("\n",f"{model_name_string} is the best model")
-    return best_model, best_hyperparameters, performance_metrics
+    print(f"\n{model_name_string} is the best model\n")
+    y_test_pred = best_model.predict(X_test)
+    y_test_rmse = mean_squared_error(y_test,y_test_pred,squared=False)
+    #plot_regression_results(y_test, y_test_pred, best_model)
+
+    custom_best_model = None
+    custom_best_hyperparameters = {}
+    custom_rmse = float("inf")
+
+    for model_name in models_to_evaluate:
+        print(f"Checking Custom Model - {model_name}")
+        custom_model_folder = f'models/regression/custom_{model_name}'
+        custom_performance_metrics_path = os.path.join(custom_model_folder,'performance_metrics.json')
+
+        with open(custom_performance_metrics_path, 'r') as f:
+            custom_performance_metrics = json.load(f)
+
+        custom_model_rmse = performance_metrics.get("validation_rmse",float)
+
+        if custom_model_rmse < custom_rmse:
+            custom_best_model = joblib.load(os.path.join(custom_model_folder,"model.joblib"))
+            hyperparameterspath =  os.path.join(custom_model_folder ,"hyperparameters.json")
+            with open(hyperparameterspath , 'r')as hp_file :
+                custom_best_hyperparameters = json.load(hp_file)
+            custom_rmse = custom_model_rmse
+            model_name_string = f"{model_name}"
+
+    print(f"\n{model_name_string} is the best model using custom\n")
+    y_custom_test_pred = custom_best_model.predict(X_test)
+    y_custom_test_rmse = mean_squared_error(y_test,y_custom_test_pred,squared=False)
+    #plot_regression_results(y_test, y_custom_test_pred, custom_best_model)
+    return best_model, best_hyperparameters, performance_metrics,y_test_rmse,custom_best_model,custom_best_hyperparameters,custom_performance_metrics,y_custom_test_rmse
+
+    """
+def plot_all_models(models:list,X_val:pd.DataFrame,y_val:pd.Series):
+    """
+    
+    """
+    if len(models) == 4:
+        k = 1
+
+        for model_name in models:
+            model_folder = f"models/regression/{model_name.lower()}"
+            model = joblib.load(os.path.join(model_folder,'model.joblib'))
+            y_pred_val = model.predict(X_val)
+
+            plt.figure(figsize=(8,6))
+            plt.scatter(y_val, y_pred_val, color='blue', label='Predicted Values', marker='o')
+            plt.scatter(y_val, y_val, color='green', label='Actual Values', marker='x')  # Actual values in green
+            plt.subplot(2,2,k)
+            # Fit a linear regression line to the scatter plot
+            slope, intercept = np.polyfit(y_val, y_pred_val, 1)
+            line_fit = slope * y_val + intercept
+            plt.plot(y_pred_val,line_fit,color='r')
+            plt.title(model_name)
+            plt.xlabel("Actual Values")
+            plt.ylabel("Predicted Values")
+            plt.tight_layout()
+            k+=1
+    
+    plt.show()
+    """
+
+def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series):
+
+    """
+    # Get the indices of the top 3 maximum values
+    top_indicesY = y_val.nlargest(3).index
+    top_indicesX = X_val.nlargest(3).index
+    # Drop the top 3 maximum values by index
+    y_val = y_val.drop(top_indicesY)
+    X_val = X_val.drop(top_indicesX)
+    """
+
+
+    if len(models) == 4:
+        plt.figure(figsize=(12, 8))  # Adjust the figure size
+
+        for k, model_name in enumerate(models, start=1):
+
+            if model_name == 'LinearRegression':
+                scaler = MinMaxScaler()
+                X_val = scaler.fit_transform(X_val)
+            
+            model_folder = f"models/regression/{model_name.lower()}"
+            model = joblib.load(os.path.join(model_folder, 'model.joblib'))
+            y_pred_val = model.predict(X_val)
+
+            plt.subplot(2, 2, k)  # Define the subplot layout
+            plt.scatter(y_val, y_pred_val, color='blue', label='Predicted Values', marker='o')
+            plt.scatter(y_val, y_val, color='green', label='Actual Values', marker='x')
+
+            plt.plot(y_pred_val,y_pred_val,color='r')
+            plt.title(model_name)
+            plt.xlabel("Actual Values")
+            plt.ylabel("Predicted Values")
+            plt.tight_layout()  # Adjust subplot layout
+
+        plt.show()
+
 
 def main():
     """
@@ -382,24 +533,24 @@ def main():
     train_regression_model(X_train, y_train, X_test, y_test)
 
     # Evaluate different regression models and save the best one
-    evaluate_all_models(X_train, y_train, X_val, y_val)
+    #evaluate_all_models(X_train, y_train, X_val, y_val)
+
+    models = ["DecisionTree", "RandomForest", "GradientBoosting","LinearRegression"]
+    plot_all_models(models,X_val,y_val)
 
     # Find the best model from the saved models
-    best_model, best_hyperparameters, performance_metrics = find_best_model()
-    print("\n Best Model:", best_model)
-    print("\n Best Hyperparameters:", best_hyperparameters)
-    print("\n Performance Metrics:", performance_metrics)
+    best_model, best_hyperparameters, performance_metrics,y_test_rmse,custom_best_model,custom_best_hyperparameters,custom_performance_metrics,y_custom_test_rmse = find_best_model(X_test,y_test)
+    print("Using GridsearchCV:")
+    print("\tBest Model:", best_model)
+    print("\tBest Hyperparameters:", best_hyperparameters)
+    print("\tPerformance Metrics:", performance_metrics)
+    print("\tTEST RMSE:",y_test_rmse)
 
-    """
-    print("using custome tune function, the best paramteters for the best model is:")
-    print("\n Best Model:", best_model)
-    print("\n Best Hyperparameters:", best_hyperparameters)
-    print("\n Performance Metrics:", performance_metrics)
-    y_test_pred = best_model.predict(X_test)
-    y_test_rmse = mean_squared_error(y_test,y_test_pred,squared=False)
-    print("TEST RMSE:",y_test_rmse)
-    print("PERFORMANCE (Test RMSE):",performance_metrics['test_rmse'])
-    """
+    print("\nUsing custome regression tuning:")
+    print("\tBest Model",custom_best_model)
+    print("\tBest Hyperparameters",custom_best_hyperparameters)
+    print("\tPerformance Metrics:", custom_performance_metrics)
+    print("\tTEST RMSE:",y_custom_test_rmse)
 
 if __name__ == "__main__":
     main()

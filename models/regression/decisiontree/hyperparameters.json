@@ -1,5 +1,7 @@
 {
-    "max_depth": 5,
-    "min_samples_leaf": 10,
-    "min_samples_split": 2
+    "criterion": "poisson",
+    "max_depth": 2,
+    "min_samples_leaf": 5,
+    "min_samples_split": 2,
+    "splitter": "best"
 }

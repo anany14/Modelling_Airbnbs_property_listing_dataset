@@ -1,5 +1,8 @@
 {
-    "alpha": 0.0001,
+    "alpha": 0.1,
+    "early_stopping": false,
+    "loss": "squared_epsilon_insensitive",
     "max_iter": 1000,
+    "penalty": "l1",
     "tol": 0.01
 }

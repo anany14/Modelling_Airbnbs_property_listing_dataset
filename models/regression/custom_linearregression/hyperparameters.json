@@ -1,0 +1,8 @@
+{
+    "loss": "epsilon_insensitive",
+    "penalty": "l1",
+    "alpha": 0.01,
+    "max_iter": 1000,
+    "tol": 0.01,
+    "early_stopping": false
+}

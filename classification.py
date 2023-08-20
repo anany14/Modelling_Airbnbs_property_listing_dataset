@@ -12,10 +12,12 @@ from typing import List, Tuple, Dict, Any
 import joblib
 import json
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 # Split dataset into training, testing, and validation sets
-def split_X_y(X: pd.DataFrame,y: pd.Series) -> Tuple:
+def split_X_y(X: pd.DataFrame,y: pd.Series, train_size: float = 0.8) -> Tuple:
     """
     Split the dataset into training,testing and validation tests.
     
@@ -24,6 +26,7 @@ def split_X_y(X: pd.DataFrame,y: pd.Series) -> Tuple:
 
         X : (pd.DataFrame) \n\t Features.
         y : (pd.Series) \n\t Labels.
+        train_size : (float),defualt = 0.8 \n\t ratio of train size compared to the whole dataset
 
     Returns
     -------
@@ -39,7 +42,7 @@ def split_X_y(X: pd.DataFrame,y: pd.Series) -> Tuple:
     y = encoder.fit_transform(y)
 
     # Splitting training and testing data 80-20
-    X_train,X_test,y_train,y_test = train_test_split(X, y, test_size=0.2, random_state=24)
+    X_train,X_test,y_train,y_test = train_test_split(X, y, train_size=train_size, random_state=24)
     # Splitting testing and validation data 50:50
     X_test,X_val,y_test,y_val = train_test_split(X_test,y_test, test_size=0.5, random_state=24)
 
@@ -67,8 +70,9 @@ def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.D
 
     Return
     ------
+        
+        None
 
-        performance_metrics : (Dict[str,float]) \nDictionary containing the performace of the model on training and test sets.
     """
     model = modelclass(max_iter=10000,random_state=24)
     # Fitting the Logistic Regression Model to the Training Set
@@ -96,15 +100,11 @@ def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.D
     test_recall_score = recall_score(y_test,y_test_pred,average ='micro')
     test_f1_score = f1_score(y_test,y_test_pred,average ='micro')
 
-    #print(f'Test Accuracy Score:\t {test_accuracy_score}')
-    #print(f'Test Precision Score:\t {test_precision_score}')
-    #print(f'Test Recall Score:\t {test_recall_score}')    
-    #print(f'Test F1 Score:\t \t {test_f1_score}')
+    print(f'Test Accuracy Score:\t {test_accuracy_score}')
+    print(f'Test Precision Score:\t {test_precision_score}')
+    print(f'Test Recall Score:\t {test_recall_score}')    
+    print(f'Test F1 Score:\t \t {test_f1_score}')
 
-    performance_metrics = {"training_accuracy":train_accuracy_score,"training_precision":train_precision_score,"training_recall":train_recall_score,
-                           "training_f1":train_f1_score,"test_accuracy":test_accuracy_score,"test_precision":test_precision_score,
-                           "test_recall":test_recall_score,"test_f1":test_f1_score}
-    return performance_metrics
 
 # Tune hyperparameters of a model and return the best model and metrics
 def tune_classification_model_hyperparameters(model_class:type,X_train:pd.DataFrame,y_train:pd.Series,
@@ -187,6 +187,55 @@ def save_model(model:type, hyperparameters:dict, performance_metrics:dict, folde
     with open(performance_metrics_name, 'w') as f:
         json.dump(performance_metrics, f, indent=4)
 
+def plot_model_comparison(models: List[str], scores: List[float], title: str,file_path: str = None):
+    """
+    Plot a bar chart comparing different models based on their performance scores.
+
+    Parameters
+    ----------
+
+        model : (list) \n
+        score : (dict) \n
+        title : (string) \n
+
+    Return
+    ------
+        None
+    """
+
+    plt.figure(figsize=(10, 6))
+    
+    # Define colors for each model's bar
+    colors = ['blue', 'green', 'orange', 'red']
+    
+    plt.bar(models, scores, color=colors)
+    
+    # Find the index of the best performing model
+    best_model_idx = np.argmax(scores)
+
+    # Retrieve the top score (maximum accuracy)
+    top_score = max(scores)
+
+    # Annotate the best performing model and top score
+    plt.annotate(f"Best: {models[best_model_idx]}  (Top Score: {top_score:.4f})", 
+                 xy=(best_model_idx, top_score), 
+                 xytext=(5, -15), textcoords='offset points',
+                 arrowprops=dict(arrowstyle="->", color='black'))
+
+    plt.title(title)
+    plt.xlabel("Models")
+    plt.ylabel("Accuracy Score")
+    plt.ylim(0, max(scores) + 0.05)  # Adjust ylim for better visualization
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    if file_path:
+        plt.savefig(file_path,format='png')
+        print(f"plot saved as {file_path}")
+    else:
+        plt.show()
+
+
 # Evaluate different models, tune hyperparameters, and save results
 def evaluate_all_models(X_train:pd.DataFrame,y_train:pd.Series,X_val:pd.DataFrame,y_val:pd.Series):
     """
@@ -231,7 +280,7 @@ def evaluate_all_models(X_train:pd.DataFrame,y_train:pd.Series,X_val:pd.DataFram
     })
     ]
     for model_name,model,hyperparameters in models_to_evaluate:
-        print(f"Evaluating{model_name}.....")
+        print(f"Checking {model_name}.....")
         best_model,best_hyperparameters,performance_metrics = tune_classification_model_hyperparameters(model,X_train,y_train,
             X_val,y_val,hyperparameters)
 
@@ -245,7 +294,7 @@ def evaluate_all_models(X_train:pd.DataFrame,y_train:pd.Series,X_val:pd.DataFram
         print(f"Model Saved for {model_name}\n")
 
 # Find the best model based on saved accuracy scores
-def find_best_model():
+def find_best_model(X_test,y_test):
     """
     Find the best model using the saved accuracy scores from previously tuned models.
 
@@ -262,6 +311,8 @@ def find_best_model():
     best_model = None
     best_hyperparameters = {}
     best_accuracy = 0.0
+    model_names = []
+    model_scores = []
 
     models_to_evaluate = ["Logistic_Regression","DecisionTree_Classifier","RandomForest_Classifier","GradientBoosting_Classifier"]
 
@@ -273,6 +324,9 @@ def find_best_model():
             performance_metrics = json.load(f) 
 
         model_accuracy = performance_metrics.get("validation_accuracy",float)
+        # modelling the model
+        model_names.append(model)
+        model_scores.append(model_accuracy)
 
         if model_accuracy > best_accuracy:
             best_model = joblib.load(os.path.join(model_folder,'model.joblib'))
@@ -282,8 +336,16 @@ def find_best_model():
             best_accuracy = model_accuracy
             model_name_string = f"{model}"
 
+    plot_model_comparison(model_names, model_scores, "Different Classification Models", "plots/classification/classification_models_comparison.png")
+
+    y_test_pred = best_model.predict(X_test)
+    test_accuracy_score = accuracy_score(y_test,y_test_pred)
+    test_precision_score = precision_score(y_test,y_test_pred,average ='micro')
+    test_recall_score = recall_score(y_test,y_test_pred,average ='micro')
+    test_f1_score = f1_score(y_test,y_test_pred,average ='micro')
+
     print(f"\n{model_name_string} is the best model.")
-    return best_model,best_hyperparameters,performance_metrics
+    return best_model,best_hyperparameters,performance_metrics,test_accuracy_score,test_precision_score,test_recall_score,test_f1_score
 
 # Main function to run the entire workflow
 def main():
@@ -306,25 +368,18 @@ def main():
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y)
     
     # Train an initial logistic regression model and print its performance
-    performance_metrics = train_logistic_model(X_train, y_train, X_test, y_test)
-    # print the initial model's performance metrics
-    print(f"\n Initial Logistic Regression Performance Metrics:\n\t Test Accuracy: {performance_metrics['test_accuracy']}\n\t Test Precision: {performance_metrics['test_precision']}\n\t Test Recall: {performance_metrics['test_recall']}\n\t Test f1: {performance_metrics['test_f1']}")
-
+    train_logistic_model(X_train, y_train, X_test, y_test)
+    #print(f"\n Initial Logistic Regression Performance Metrics:\n\t Test Accuracy: {performance_metrics['test_accuracy']}\n\t Test Precision: {performance_metrics['test_precision']}\n\t Test Recall: {performance_metrics['test_recall']}\n\t Test f1: {performance_metrics['test_f1']}")
+    X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y,train_size=0.65)
     # Evaluate various models using hyperparameter tuning and save results
-    evaluate_all_models(X_train, y_train, X_val, y_val)
+    # evaluate_all_models(X_train, y_train, X_val, y_val)
     
     # Find the best model and print its hyperparameters and performance
-    best_model, best_hyperparameters, performance_metrics = find_best_model()
+    best_model, best_hyperparameters, performance_metrics, test_accuracy_score, test_precision_score, test_recall_score, test_f1_score = find_best_model(X_test,y_test)
     # print the best model's hyperparameters and performance metrics
+    print(f"{best_model}")
     print(f"The best Hyperparameters are:\n\t {best_hyperparameters}")
     print(f"The best Performance Metrics are:\n\t {performance_metrics}")
-
-    # Evaluate the best model on the test set and print its performance
-    y_test_pred = best_model.predict(X_test)
-    test_accuracy_score = accuracy_score(y_test, y_test_pred)
-    test_precision_score = precision_score(y_test, y_test_pred, average='micro')
-    test_recall_score = recall_score(y_test, y_test_pred, average='micro')
-    test_f1_score = f1_score(y_test, y_test_pred, average='micro')
     # print the best model's test performance metrics
     print(f'Test Accuracy:\t {test_accuracy_score}')
     print(f'Test Precision:\t {test_precision_score}')
