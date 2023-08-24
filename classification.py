@@ -15,6 +15,10 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
+from sklearn.metrics import confusion_matrix
+
+
 
 # Split dataset into training, testing, and validation sets
 def split_X_y(X: pd.DataFrame,y: pd.Series, train_size: float = 0.8) -> Tuple:
@@ -104,6 +108,8 @@ def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.D
     print(f'Test Precision Score:\t {test_precision_score}')
     print(f'Test Recall Score:\t {test_recall_score}')    
     print(f'Test F1 Score:\t \t {test_f1_score}')
+
+    return model
 
 
 # Tune hyperparameters of a model and return the best model and metrics
@@ -288,7 +294,7 @@ def find_best_model(X_test,y_test):
             best_accuracy = model_accuracy
             model_name_string = f"{model}"
 
-    plot_model_comparison(model_names, model_scores, "Different Classification Models", "plots/classification/classification_models_comparison.png")
+    plot_models(model_names, scores = model_scores, file_path = "plots/classification/classification_models_comparison.png")
 
     y_test_pred = best_model.predict(X_test)
     test_accuracy_score = accuracy_score(y_test,y_test_pred)
@@ -300,7 +306,7 @@ def find_best_model(X_test,y_test):
     return best_model,best_hyperparameters,performance_metrics,test_accuracy_score,test_precision_score,test_recall_score,test_f1_score
 
 
-def plot_model_comparison(models: List[str], scores: List[float], title: str,file_path: str = None):
+def plot_models(models:List, X_val:np.ndarray = None, y_val:np.ndarray = None, scores:List[float]=None, file_path:str=None):
     """
     Plot a bar chart comparing different models based on their performance scores.
 
@@ -315,43 +321,70 @@ def plot_model_comparison(models: List[str], scores: List[float], title: str,fil
     ------
         None
     """
-
-    plt.figure(figsize=(10, 6))
-    
     # Define colors for each model's bar
     Olive_Green= "#808000"
     Terracotta= "#E2725B"
     Sandy_Brown= "#F4A460"
     Muted_Blue= "#6C7A89"
-    colors = [Olive_Green,Terracotta,Sandy_Brown,Muted_Blue]
 
-    
-    plt.bar(models, scores, color=colors)
-    
-    # Find the index of the best performing model
-    best_model_idx = np.argmax(scores)
+    if len(models) == 4:
 
-    # Retrieve the top score (maximum accuracy)
-    top_score = max(scores)
+        plt.figure(figsize=(10, 6))
+        plt.bar(models, scores, color = [Olive_Green,Terracotta,Sandy_Brown,Muted_Blue])
+        
+        # Find the index of the best performing model
+        best_model_idx = np.argmax(scores)
 
-    # Annotate the best performing model and top score
-    plt.annotate(f"Best: {models[best_model_idx]}  (Top Score: {top_score:.4f})", 
-                 xy=(best_model_idx, top_score), 
-                 xytext=(5, -15), textcoords='offset points',
-                 arrowprops=dict(arrowstyle="->", color='black'))
+        # Retrieve the top score (maximum accuracy)
+        top_score = max(scores)
 
-    plt.title(title)
-    plt.xlabel("Models")
-    plt.ylabel("Accuracy Score")
-    plt.ylim(0, max(scores) + 0.05)  # Adjust ylim for better visualization
-    plt.xticks(rotation=45)
-    plt.tight_layout()
+        # Annotate the best performing model and top score
+        plt.annotate(f"Best: {models[best_model_idx]}  (Top Score: {top_score:.4f})", 
+                    xy=(best_model_idx, top_score), 
+                    xytext=(5, -15), textcoords='offset points',
+                    arrowprops=dict(arrowstyle="->", color='black'))
 
-    if file_path:
-        plt.savefig(file_path,format='png')
-        print(f"plot saved as {file_path}")
-    else:
-        plt.show()
+        plt.title("Different Classification Models")
+        plt.xlabel("Models")
+        plt.ylabel("Accuracy Score")
+        plt.ylim(0, max(scores) + 0.05)  # Adjust ylim for better visualization
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        if file_path:
+            plt.savefig(file_path,format='png')
+            print(f"plot saved as {file_path}")
+        else:
+            plt.show()
+
+
+    if len(models) == 1:
+        model = models[0]
+        class_names = ["Class 0", "Class 1", "Class 2", "Class 3", "Class 4"]
+
+        plt.figure(figsize=(12, 6))
+
+        y_pred_val = model.predict(X_val)
+        cm = confusion_matrix(y_val, y_pred_val)
+        plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+        if model == LogisticRegression:
+            plt.title(f"Confusion Matrix for {model} without hyperparameters")
+        else:
+            plt.title(f"Confusion Matrix for {model}")
+        plt.colorbar()
+        tick_marks = np.arange(len(class_names))
+        plt.xticks(tick_marks, class_names, rotation=45)
+        plt.yticks(tick_marks, class_names)
+        plt.xlabel("Predicted Value")
+        plt.ylabel("Actual Value")
+
+        plt.tight_layout()
+
+        if file_path:
+            plt.savefig(file_path, format='png')
+            print(f"Plot saved as {file_path}")
+        else:
+            plt.show()
 
 
 # Main function to run the entire workflow
@@ -375,15 +408,19 @@ def main():
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y)
     
     # Train an initial logistic regression model and print its performance
-    train_logistic_model(X_train, y_train, X_test, y_test)
+    modelwithouthyperparameters = train_logistic_model(X_train, y_train, X_test, y_test)
+    plot_models([modelwithouthyperparameters],X_val=X_val,y_val=y_val,file_path="plots/classification/logisticclassification_confusion_wo_hyperparameters.png")
+    
     #print(f"\n Initial Logistic Regression Performance Metrics:\n\t Test Accuracy: {performance_metrics['test_accuracy']}\n\t Test Precision: {performance_metrics['test_precision']}\n\t Test Recall: {performance_metrics['test_recall']}\n\t Test f1: {performance_metrics['test_f1']}")
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y,train_size=0.65)
     # Evaluate various models using hyperparameter tuning and save results
     # evaluate_all_models(X_train, y_train, X_val, y_val)
-    
+
     # Find the best model and print its hyperparameters and performance
     best_model, best_hyperparameters, performance_metrics, test_accuracy_score, test_precision_score, test_recall_score, test_f1_score = find_best_model(X_test,y_test)
     # print the best model's hyperparameters and performance metrics
+    plot_models([best_model],X_val,y_val,file_path="plots/classification/best_model_confusion_matrix.png")
+
     print(f"{best_model}")
     print(f"The best Hyperparameters are:\n\t {best_hyperparameters}")
     print(f"The best Performance Metrics are:\n\t {performance_metrics}")

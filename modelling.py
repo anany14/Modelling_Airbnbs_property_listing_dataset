@@ -506,7 +506,6 @@ def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series, file_pa
         else:
             plt.show()
 
-
 def main():
     """
     Runs all preprocessing steps and saves a trained model.
