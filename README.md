@@ -1,12 +1,14 @@
 # Modelling_Airbnbs_property_listing_dataset
 
-
 Welcome to the **Airbnb Model Evaluation Framework**! This project aims to create a versatile framework for systematically training, tuning, and evaluating machine learning models for a wide range of tasks, inspired by the challenges faced by the Airbnb team. Whether you're working with tabular, image, or text data, this framework will help you build effective models and streamline the evaluation process.
 
 ## Built With
 
 This project leverages several essential frameworks and tools to achieve its goals:
 
+- [GitHub](https://github.com/) - Hosting and version control for collaborative development.
+- [Jupyter Notebook](https://jupyterlab.readthedocs.io/en) - An open source web application that allows you to create and share.
+- [Python 3.7](https://www.python.org/downloads) - The programming language used in this project.
 - [Pandas](https://pandas.pydata.org/) - Data manipulation and analysis in Python.
 - [Scikit-Learn](https://scikit-learn.org/) - Machine learning library in Python.
 - [NumPy](https://numpy.org/) - Fundamental package for scientific computing with Python.
@@ -14,6 +16,8 @@ This project leverages several essential frameworks and tools to achieve its goa
 - [JSON](https://www.json.org/) - For storing hyperparameters and performance metrics.
 - [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) - Grid search for hyperparameter tuning.
 - [MinMaxScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) - Feature scaling.
+- [Matplotlib](https://matplotlib.org/stable/index.html) - Plotting graphs, charts etc., in Python.
+
 
 ## Getting Started
 
@@ -47,13 +51,16 @@ Use the Airbnb Model Evaluation Framework to build and evaluate machine learning
 
 1. Run the `tabular_data.py` script to download the dataset as a [PANDAS] DataFrame and then clean the data, remove unnecessary data, convert datatypes and get all the columns in the right format with the correct values.
 
-2. Run the `modelling.py` script to build and evaluate regression models to predict the price per night of the Airbnb property listings using various models such as [SGDRegressor],[DecisionTreeRegressor],[RandomForestRegressor] and [GradientBoostingRegressor]
+2. Run the `modelling.py` script to perform regression modeling, hyperparameter tuning, and evaluation of the models to predict the price per night of the Airbnb property listings using various models such as [SGDRegressor],[DecisionTreeRegressor],[RandomForestRegressor] and [GradientBoostingRegressor].
 
-3. 
+3. Run the `classification.py` script to train, tune, and evaluate classification models on the Airbnb dataset for predicting property categories using models like [LogisticRegression], [DecisionTreeClassifier], [RandomForestClassifier], and [GradientBoostingClassifier].
 
-4. 
+4. Both the scripts contain functions to plot the performance of different models which are in the folders `plots/regression` and `plots/classification` 
 
 5. 
+
+6. 
+
 
 
 <!---
@@ -67,16 +74,6 @@ We have some exciting plans for the future of this framework:
 - Introduce multi-language support.
 - Include more configurable neural network architectures.
 --->
-
-## Acknowledgments
-
-We'd like to acknowledge the following resources that have been instrumental in building this framework:
-
-- [Scikit-Learn](https://scikit-learn.org/) - Providing a powerful and flexible machine learning library.
-- [Pandas](https://pandas.pydata.org/) - Enabling efficient data manipulation and analysis.
-- [NumPy](https://numpy.org/) - Essential for scientific computing in Python.
-- [Joblib](https://joblib.readthedocs.io/) - Helping with efficient object serialization.
-- [GitHub](https://github.com/) - Hosting and version control for collaborative development.
 
 ## Introduction
 
@@ -95,7 +92,7 @@ This project aims to build a systematic framework for training, tuning, and eval
 
 6. Reuse the framework for another use-case: Test the flexibility of the framework by applying it to a different dataset, ensuring that it can handle various data types.
 
-### Data Cleaning (tabular_data.py)
+## Data Cleaning (tabular_data.py)
 
 The `tabular_data.py` module contains functions for cleaning and preprocessing the Airbnb property listing dataset. The key steps include:
 
@@ -111,7 +108,9 @@ The `tabular_data.py` module contains functions for cleaning and preprocessing t
 
 6. **Cleaning Tabular Data:** The `clean_tabular_data` function applies a series of data cleaning steps, combining the above functions to obtain a cleaned DataFrame.
 
-### Regression Modeling (modelling.py)
+7. **load_airbnb:** The `load_airbnb` function Extract features and labels from the DataFrame. 
+
+## Regression Modeling (modelling.py)
 
 The `modelling.py` module focuses on building and evaluating regression models to predict the price per night of the Airbnb property listings. The key steps include:
 
@@ -127,7 +126,9 @@ The `modelling.py` module focuses on building and evaluating regression models t
 
 6. **Finding the Best Model:** The `find_best_model` function identifies the best-performing model based on the saved validation RMSE values from the earlier model evaluations.
 
-### Model Selection and Metrics
+7. **Plotting Data:** The `plot_all_models` function plots either a comparison of different models using scatterplots or the total performance if a single model is provided.
+
+#### Model Selection and Metrics
 
 In the file `modelling.py`, we evaluated several regression models:
 
@@ -139,13 +140,15 @@ In the file `modelling.py`, we evaluated several regression models:
 
 4. **Gradient Boosting Regressor**: A boosting algorithm that combines weak learners into a strong predictive model.
 
-## Model Performance
+### Model Performance
 
 The best model based on the validation RMSE is the chosen model for making predictions on new data. The key metrics used for evaluation are:
 
 1. **Root Mean Squared Error (RMSE)**: A measure of the average deviation between the predicted and actual values. Lower RMSE indicates better model performance.
 
 2. **R-squared (R2) Score**: A measure of how well the model explains the variance in the target variable. Higher R2 score indicates a better fit to the data.
+
+![This is the Model performance of the LinearRegression class without tuning the hyperparameters](plots/regression/sgdregression_without_hyperparameters.png)
 
 ### Model Performance Metrics 
 
@@ -173,7 +176,16 @@ The best model based on the validation RMSE is the chosen model for making predi
     - validation_rmse: 107.80684569675182
     - validation_r2: 0.11430983256579175
 
-- The best model to fit the data is `GradientBoostingRegressor(learning_rate=0.01, n_estimators=300, random_state=42)`
+
+![Comparison Plot](plots/regression/model_comparison.png)
+
+
+### Best Model 
+
+- The best model and it's best hyperparameters to fit the data is `GradientBoostingRegressor(learning_rate=0.01, n_estimators=300, random_state=42)`
+- The RMSE on the testing dataset is `131.073797`
+
+![Best Model Performance](plots/regression/best_model.png)
 
 ### Further Experiments
 
@@ -189,9 +201,7 @@ While we have explored a variety of regression models and performed hyperparamet
 
 5. **Handling Outliers**: Exploring techniques to handle outliers in the data may improve the robustness of our models.
 
-
-
-
+## Classification Modellig 
 
 
 
@@ -229,3 +239,4 @@ For any questions or inquiries, please feel free to reach out:
 Anany Tripathi - ananytripathi10@gmail.com
 
 Project Link: [https://github.com/anany14/Modelling_Airbnbs_property_listing_dataset]
+
