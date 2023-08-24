@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import numpy as np
+import statsmodels.api as sm
+
 
 # Split dataset into training, testing, and validation sets
 def split_X_y(X:pd.DataFrame, y:pd.Series)->Tuple:
@@ -91,6 +93,7 @@ def train_regression_model(X_train:pd.DataFrame, y_train:pd.Series, X_test:pd.Da
     print(f"Initial Test RMSE: {test_rmse} | Initial Test R-squared (R2): {test_r2}\n")
     # The outputs at this point suggest that there might be some issues with the model
     # Extreme high values of MSE and negative R-squared suggest that the model is not fitting well
+    return model
 
 # Custom tune hyperparameters of a model and return the best model and metrics
 def custom_tune_regression_model_hyperparameters(model_class: type,X_train: pd.DataFrame,y_train: pd.Series,X_val: pd.DataFrame,y_val: pd.Series,hyperparameters: Dict[str, List]):
@@ -244,31 +247,7 @@ def save_model(model, hyperparameters, performance_metrics, folder='models/regre
     with open(performance_metrics_name, 'w') as f:
         json.dump(performance_metrics, f, indent=4)
 
-
-# Create scatter plot with line of best fit for regression models
-def plot_regression_results(y_actual, y_predicted, model_name):
-    """
     
-    """
-    plt.figure(figsize=(8, 6))
-    
-    plt.scatter(y_actual, y_predicted, color='blue', alpha=0.5)
-    
-    # Fit a linear regression line to the scatter plot
-    slope, intercept = np.polyfit(y_actual, y_predicted, 1)
-    line_fit = slope * y_actual + intercept
-    
-    plt.plot(y_actual, line_fit, color='red')
-    
-    plt.title(f"Scatter Plot with Line of Best Fit ({model_name})")
-    plt.xlabel("Actual Values")
-    plt.ylabel("Predicted Values")
-    plt.tight_layout()
-    
-    plt.show()
-
-    
-
 def evaluate_all_models(X_train, y_train, X_val, y_val):
     """
     Evaluate different regression models using hyperparameter tuning and save results.
@@ -368,8 +347,6 @@ def evaluate_all_models(X_train, y_train, X_val, y_val):
     print("\n")
 
 
-
-
 def find_best_model(X_test,y_test):
     """
     Find the best model based on the saved RMSE values from previously tuned models.
@@ -442,47 +419,14 @@ def find_best_model(X_test,y_test):
     #plot_regression_results(y_test, y_custom_test_pred, custom_best_model)
     return best_model, best_hyperparameters, performance_metrics,y_test_rmse,custom_best_model,custom_best_hyperparameters,custom_performance_metrics,y_custom_test_rmse
 
-    """
-def plot_all_models(models:list,X_val:pd.DataFrame,y_val:pd.Series):
-    """
-    
-    """
-    if len(models) == 4:
-        k = 1
 
-        for model_name in models:
-            model_folder = f"models/regression/{model_name.lower()}"
-            model = joblib.load(os.path.join(model_folder,'model.joblib'))
-            y_pred_val = model.predict(X_val)
+def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series, file_path: str = None):
 
-            plt.figure(figsize=(8,6))
-            plt.scatter(y_val, y_pred_val, color='blue', label='Predicted Values', marker='o')
-            plt.scatter(y_val, y_val, color='green', label='Actual Values', marker='x')  # Actual values in green
-            plt.subplot(2,2,k)
-            # Fit a linear regression line to the scatter plot
-            slope, intercept = np.polyfit(y_val, y_pred_val, 1)
-            line_fit = slope * y_val + intercept
-            plt.plot(y_pred_val,line_fit,color='r')
-            plt.title(model_name)
-            plt.xlabel("Actual Values")
-            plt.ylabel("Predicted Values")
-            plt.tight_layout()
-            k+=1
-    
-    plt.show()
-    """
-
-def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series):
-
-    """
-    # Get the indices of the top 3 maximum values
-    top_indicesY = y_val.nlargest(3).index
-    top_indicesX = X_val.nlargest(3).index
-    # Drop the top 3 maximum values by index
-    y_val = y_val.drop(top_indicesY)
-    X_val = X_val.drop(top_indicesX)
-    """
-
+    Charcoal = "#36454F"
+    Teal = "#008080"
+    Coral = "#FF6B6B"
+    Peach = "#FFDAB9"
+    Olive_Green = "#808000"
 
     if len(models) == 4:
         plt.figure(figsize=(12, 8))  # Adjust the figure size
@@ -491,23 +435,76 @@ def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series):
 
             if model_name == 'LinearRegression':
                 scaler = MinMaxScaler()
-                X_val = scaler.fit_transform(X_val)
+                X_val_scaled = scaler.fit_transform(X_val)
+            else:
+                X_val_scaled = X_val
             
             model_folder = f"models/regression/{model_name.lower()}"
             model = joblib.load(os.path.join(model_folder, 'model.joblib'))
-            y_pred_val = model.predict(X_val)
+            y_pred_val = model.predict(X_val_scaled)
 
             plt.subplot(2, 2, k)  # Define the subplot layout
-            plt.scatter(y_val, y_pred_val, color='blue', label='Predicted Values', marker='o')
-            plt.scatter(y_val, y_val, color='green', label='Actual Values', marker='x')
-
-            plt.plot(y_pred_val,y_pred_val,color='r')
-            plt.title(model_name)
-            plt.xlabel("Actual Values")
-            plt.ylabel("Predicted Values")
+            plt.scatter(X_val.iloc[:, 0], y_pred_val, color=Teal, label='Predicted Values', marker='x')
+            plt.scatter(X_val.iloc[:, 0], y_val, color=Coral, label='Actual Values', marker='o')
+            plt.title(f"\n{model_name}")
+            plt.legend()
+            plt.xlabel("Dataset Features (Validation Sample) X_val")
+            plt.ylabel("Label (Price per Night) y_val")
             plt.tight_layout()  # Adjust subplot layout
 
-        plt.show()
+        plt.suptitle("Scatterplot Comparison between 4 Different Regression models")
+        if file_path:
+            plt.savefig(file_path, format='png')
+            print(f"SubPlot saved as {file_path}")
+        else:
+            plt.show()
+
+
+    if len(models) == 1:
+
+        model = models[0]
+        y_pred_val = model.predict(X_val)
+        plt.figure(figsize=(8, 6))
+
+        plt.subplot(2, 2, 1)
+        plt.scatter(X_val.iloc[:, 0], y_val, color=Teal, label="Actual Values", marker='o')
+        plt.scatter(X_val.iloc[:, 0], y_pred_val, color=Coral, label="Predicted Values", marker='x')
+        plt.xlabel("Dataset Features (Validation Sample) X_val")
+        plt.ylabel("Label (Price per Night) y_val")
+        plt.title("Scatterplot between real and predicted values")
+        plt.legend()
+
+        residuals = y_val - y_pred_val
+        plt.subplot(2, 2, 2)
+        plt.scatter(X_val.iloc[:, 0], residuals, color = Olive_Green)
+        plt.axhline(y=0, color=Charcoal, linestyle='--')
+        plt.xlabel("Dataset Features (Validation Sample) X_val")
+        plt.ylabel("Label (Price per Night) y_val")
+        plt.title("Residual Plot")
+
+        plt.subplot(2, 2, 3)
+        plt.hist(residuals, bins=20, edgecolor='k', color=Peach)
+        plt.xlabel("Residuals")
+        plt.ylabel("Frequency")
+        plt.title("Distribution of Residuals using a histogram")
+
+        plt.subplot(2, 2, 4)
+        ax = plt.gca()
+        sm.qqplot(residuals,fit=True ,line='r', ax=ax)
+        plt.title("Q-Q Plot with a regression fit")
+
+        if isinstance(model, SGDRegressor):
+            plt.suptitle("SGDRegressor without Hyperparameters")
+        else:
+            plt.suptitle(f"Best Model: {model}")
+
+        plt.tight_layout()
+
+        if file_path:
+            plt.savefig(file_path, format='png')
+            print(f"SubPlot saved as {file_path}")
+        else:
+            plt.show()
 
 
 def main():
@@ -530,27 +527,31 @@ def main():
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y)
 
     # Train an initial regression model and print its performance
-    train_regression_model(X_train, y_train, X_test, y_test)
+    modelwithouthyperparameters = train_regression_model(X_train, y_train, X_test, y_test)
+    plot_all_models([modelwithouthyperparameters],X_val,y_val,"plots/regression/sgdregression_without_hyperparameters.png")
 
     # Evaluate different regression models and save the best one
     #evaluate_all_models(X_train, y_train, X_val, y_val)
 
     models = ["DecisionTree", "RandomForest", "GradientBoosting","LinearRegression"]
-    plot_all_models(models,X_val,y_val)
+    plot_all_models(models,X_val,y_val,"plots/regression/model_comparison.png")
 
     # Find the best model from the saved models
     best_model, best_hyperparameters, performance_metrics,y_test_rmse,custom_best_model,custom_best_hyperparameters,custom_performance_metrics,y_custom_test_rmse = find_best_model(X_test,y_test)
-    print("Using GridsearchCV:")
-    print("\tBest Model:", best_model)
-    print("\tBest Hyperparameters:", best_hyperparameters)
-    print("\tPerformance Metrics:", performance_metrics)
-    print("\tTEST RMSE:",y_test_rmse)
 
     print("\nUsing custome regression tuning:")
     print("\tBest Model",custom_best_model)
     print("\tBest Hyperparameters",custom_best_hyperparameters)
     print("\tPerformance Metrics:", custom_performance_metrics)
     print("\tTEST RMSE:",y_custom_test_rmse)
+
+    print("\nUsing GridsearchCV:")
+    print("\tBest Model:", best_model)
+    print("\tBest Hyperparameters:", best_hyperparameters)
+    print("\tPerformance Metrics:", performance_metrics)
+    print("\tTEST RMSE:",y_test_rmse)
+
+    plot_all_models([best_model],X_val,y_val,"plots/regression/best_model.png")
 
 if __name__ == "__main__":
     main()

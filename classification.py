@@ -187,54 +187,6 @@ def save_model(model:type, hyperparameters:dict, performance_metrics:dict, folde
     with open(performance_metrics_name, 'w') as f:
         json.dump(performance_metrics, f, indent=4)
 
-def plot_model_comparison(models: List[str], scores: List[float], title: str,file_path: str = None):
-    """
-    Plot a bar chart comparing different models based on their performance scores.
-
-    Parameters
-    ----------
-
-        model : (list) \n
-        score : (dict) \n
-        title : (string) \n
-
-    Return
-    ------
-        None
-    """
-
-    plt.figure(figsize=(10, 6))
-    
-    # Define colors for each model's bar
-    colors = ['blue', 'green', 'orange', 'red']
-    
-    plt.bar(models, scores, color=colors)
-    
-    # Find the index of the best performing model
-    best_model_idx = np.argmax(scores)
-
-    # Retrieve the top score (maximum accuracy)
-    top_score = max(scores)
-
-    # Annotate the best performing model and top score
-    plt.annotate(f"Best: {models[best_model_idx]}  (Top Score: {top_score:.4f})", 
-                 xy=(best_model_idx, top_score), 
-                 xytext=(5, -15), textcoords='offset points',
-                 arrowprops=dict(arrowstyle="->", color='black'))
-
-    plt.title(title)
-    plt.xlabel("Models")
-    plt.ylabel("Accuracy Score")
-    plt.ylim(0, max(scores) + 0.05)  # Adjust ylim for better visualization
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    if file_path:
-        plt.savefig(file_path,format='png')
-        print(f"plot saved as {file_path}")
-    else:
-        plt.show()
-
 
 # Evaluate different models, tune hyperparameters, and save results
 def evaluate_all_models(X_train:pd.DataFrame,y_train:pd.Series,X_val:pd.DataFrame,y_val:pd.Series):
@@ -346,6 +298,61 @@ def find_best_model(X_test,y_test):
 
     print(f"\n{model_name_string} is the best model.")
     return best_model,best_hyperparameters,performance_metrics,test_accuracy_score,test_precision_score,test_recall_score,test_f1_score
+
+
+def plot_model_comparison(models: List[str], scores: List[float], title: str,file_path: str = None):
+    """
+    Plot a bar chart comparing different models based on their performance scores.
+
+    Parameters
+    ----------
+
+        model : (list) \n
+        score : (dict) \n
+        title : (string) \n
+
+    Return
+    ------
+        None
+    """
+
+    plt.figure(figsize=(10, 6))
+    
+    # Define colors for each model's bar
+    Olive_Green= "#808000"
+    Terracotta= "#E2725B"
+    Sandy_Brown= "#F4A460"
+    Muted_Blue= "#6C7A89"
+    colors = [Olive_Green,Terracotta,Sandy_Brown,Muted_Blue]
+
+    
+    plt.bar(models, scores, color=colors)
+    
+    # Find the index of the best performing model
+    best_model_idx = np.argmax(scores)
+
+    # Retrieve the top score (maximum accuracy)
+    top_score = max(scores)
+
+    # Annotate the best performing model and top score
+    plt.annotate(f"Best: {models[best_model_idx]}  (Top Score: {top_score:.4f})", 
+                 xy=(best_model_idx, top_score), 
+                 xytext=(5, -15), textcoords='offset points',
+                 arrowprops=dict(arrowstyle="->", color='black'))
+
+    plt.title(title)
+    plt.xlabel("Models")
+    plt.ylabel("Accuracy Score")
+    plt.ylim(0, max(scores) + 0.05)  # Adjust ylim for better visualization
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    if file_path:
+        plt.savefig(file_path,format='png')
+        print(f"plot saved as {file_path}")
+    else:
+        plt.show()
+
 
 # Main function to run the entire workflow
 def main():
