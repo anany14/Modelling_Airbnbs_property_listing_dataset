@@ -161,28 +161,28 @@ The best model based on the validation RMSE is the chosen model for making predi
 ### Model Performance Metrics 
 
 - **Linear Regression (SGDRegressor)**:
-    - best hyperparameters: {'alpha': 1e-05, 'max_iter': 1000, 'tol': 0.001}
-    - gridsearch_rmse: 97.7362631514105
-    - validation_rmse: 127.4768534817222
-    - validation_r2: -0.23837397130168658
+    - best hyperparameters: {"alpha": 0.1,"early_stopping": false,"loss": "squared_epsilon_insensitive","max_iter": 1000,"penalty": "l1","tol": 0.01}
+    - "gridsearch_rmse": 97.5211322126212,
+    - "validation_rmse": 133.73609364043634,
+    - "validation_r2": -0.36297036119731807
 
 - **Decision Tree Regressor**:
-    - best hyperparameters: {'max_depth': 5, 'min_samples_leaf': 10, 'min_samples_split': 2}
-    - gridsearch_rmse: 99.83932831904127
-    - validation_rmse: 104.07966226324588
-    - validation_r2: 0.174492747038261
+    - best hyperparameters: {"criterion": "poisson", "max_depth": 2, "min_samples_leaf": 5, "min_samples_split": 2, "splitter": "best"}
+    - "gridsearch_rmse": 97.96613641100369,
+    - "validation_rmse": 109.43713370660083,
+    - "validation_r2": 0.0873199354688664
 
 - **Random Forest Regressor**:
-    - best hyperparameters: {'max_depth': None, 'min_samples_leaf': 10, 'min_samples_split': 2, 'n_estimators': 300}
-    - gridsearch_rmse: 93.53765214999888
-    - validation_rmse: 101.63984683370312
-    - validation_r2: 0.212741880233853
+    - best hyperparameters: {"criterion": "absolute_error","max_depth": null,"min_samples_leaf": 5,"min_samples_split": 2,"n_estimators": 200}
+    - "gridsearch_rmse": 92.62686487608235,
+    - "validation_rmse": 101.86512427627144,
+    - "validation_r2": 0.2092482102837555
 
 - **Gradient Boosting Regressor**:
-    - best hyperparameters: {'learning_rate': 0.05, 'max_depth': 3, 'n_estimators': 300}
-    - gridsearch_rmse: 102.7416140657607
-    - validation_rmse: 107.80684569675182
-    - validation_r2: 0.11430983256579175
+    - best hyperparameters: {"alpha": 0.9,"learning_rate": 0.01,"loss": "huber","max_depth": 3,"n_estimators": 300}
+    - "gridsearch_rmse": 95.05038890665303,
+    - "validation_rmse": 102.33429938368708,
+    - "validation_r2": 0.20194727298172055
 
 
 <figure>
@@ -193,7 +193,7 @@ The best model based on the validation RMSE is the chosen model for making predi
 
 ### Best Model 
 
-- The best model and it's best hyperparameters to fit the data is `GradientBoostingRegressor(learning_rate=0.01, n_estimators=300, random_state=42)`
+- The best model and it's best hyperparameters to fit the data is `RandomForestRegressor(criterion='absolute_error', min_samples_leaf=5,n_estimators=200, random_state=42)` 
 - The RMSE on the testing dataset is `131.073797`
 
 <figure>

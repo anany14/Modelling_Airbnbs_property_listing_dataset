@@ -259,30 +259,7 @@ def evaluate_all_models(X_train, y_train, X_val, y_val):
         y_train : (pd.Series) \nTraining labels.
         X_val : (pd.DataFrame) \nValidation features.
         y_val : (pd.Series) \nValidation labels.
-    
-    Hyperparameters for regression models
-    ---------------
 
-    \t``SGDRegressor`` - 
-    \n``alpha``: This controls the regularization strength. Start with a small value like 0.0001 and gradually increase if needed.
-    \n``max_iter``: The maximum number of iterations. A larger value, such as 1000, should be a reasonable starting point.
-    \n``tol``: The tolerance for stopping criteria. You can start with 1e-3.
-    
-    \t``DecisionTreeRegressor`` - 
-    \n``max_depth``: Maximum depth of the tree. Start with None (no depth limit) and then try smaller values like 5, 3, or 1.
-    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
-    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
-
-    \t``RandomForestRegressor`` - 
-    \n``n_estimators``: The number of trees in the forest. Start with a moderate number, such as 100, and tune from there.
-    \n``max_depth``: Maximum depth of the individual trees. Similar to the decision tree, start with None.
-    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
-    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
-
-    \t``GradientBoostingRegressor`` -
-    \n``n_estimators``: The number of boosting stages (trees). Start with 100 or 150.
-    \n``max_depth``: Maximum depth of the individual trees. Start with a smaller value like 3 or 5.
-    \n``learning_rate``: The step size shrinkage used to prevent overfitting. Start with 0.1
     
     Returns
     -------
@@ -354,7 +331,8 @@ def find_best_model(X_test,y_test):
     Parameters
     ----------
 
-        None
+        X_test : (pd.DataFrame) \nTesting Features.
+        y_test : (pd.Series) \nTesting Labels.
 
     Returns
     -------
@@ -421,6 +399,21 @@ def find_best_model(X_test,y_test):
 
 
 def plot_all_models(models: list, X_val: pd.DataFrame, y_val: pd.Series, file_path: str = None):
+    """
+    Comparing different models based on their validation_rmse and plotting the performance if only a single model has been passed.
+
+    Parameters
+    ----------
+
+        models : (list) \nList of Models.
+        X_val : (pd.DataFrame) \n Validation Features.
+        y_val : (pd.Series) \n Validation Series. 
+        file_path : (string) \nPath where the plot is to be saved.
+
+    Return
+    ------
+        None
+    """
 
     Charcoal = "#36454F"
     Teal = "#008080"
@@ -530,7 +523,7 @@ def main():
     plot_all_models([modelwithouthyperparameters],X_val,y_val,"plots/regression/sgdregression_without_hyperparameters.png")
 
     # Evaluate different regression models and save the best one
-    #evaluate_all_models(X_train, y_train, X_val, y_val)
+    evaluate_all_models(X_train, y_train, X_val, y_val)
 
     models = ["DecisionTree", "RandomForest", "GradientBoosting","LinearRegression"]
     plot_all_models(models,X_val,y_val,"plots/regression/model_comparison.png")
@@ -554,3 +547,36 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+"""
+
+        Hyperparameters for regression models
+    ---------------
+
+    \t``SGDRegressor`` - 
+    \n``alpha``: This controls the regularization strength. Start with a small value like 0.0001 and gradually increase if needed.
+    \n``max_iter``: The maximum number of iterations. A larger value, such as 1000, should be a reasonable starting point.
+    \n``tol``: The tolerance for stopping criteria. You can start with 1e-3.
+    
+    \t``DecisionTreeRegressor`` - 
+    \n``max_depth``: Maximum depth of the tree. Start with None (no depth limit) and then try smaller values like 5, 3, or 1.
+    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
+    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
+
+    \t``RandomForestRegressor`` - 
+    \n``n_estimators``: The number of trees in the forest. Start with a moderate number, such as 100, and tune from there.
+    \n``max_depth``: Maximum depth of the individual trees. Similar to the decision tree, start with None.
+    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
+    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
+
+    \t``GradientBoostingRegressor`` -
+    \n``n_estimators``: The number of boosting stages (trees). Start with 100 or 150.
+    \n``max_depth``: Maximum depth of the individual trees. Start with a smaller value like 3 or 5.
+    \n``learning_rate``: The step size shrinkage used to prevent overfitting. Start with 0.1
+
+"""

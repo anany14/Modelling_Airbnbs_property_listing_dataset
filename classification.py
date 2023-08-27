@@ -59,7 +59,7 @@ def split_X_y(X: pd.DataFrame,y: pd.Series, train_size: float = 0.8) -> Tuple:
     return (X_train,y_train,X_test,y_test, X_val,y_val)
 
 # Train a logistic regression model and return performance metrics
-def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series,modelclass : type[LogisticRegression] = LogisticRegression)->Dict[str,float]:
+def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series,modelclass : type = LogisticRegression)-> Any:
     """
     Train a logistic regression classifier on the given dataset.
     
@@ -75,7 +75,7 @@ def train_logistic_model(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.D
     Return
     ------
         
-        None
+        model : A model trained on the dataset 
 
     """
     model = modelclass(max_iter=10000,random_state=24)
@@ -252,17 +252,18 @@ def evaluate_all_models(X_train:pd.DataFrame,y_train:pd.Series,X_val:pd.DataFram
         print(f"Model Saved for {model_name}\n")
 
 # Find the best model based on saved accuracy scores
-def find_best_model(X_test,y_test):
+def find_best_model(X_test,y_test)->Tuple:
     """
     Find the best model using the saved accuracy scores from previously tuned models.
 
     Parameters
     ----------
-        None
+        X_test : (pd.DataFrame) \n Testing features.
+        y_test : (pd.Series) \n Testing labels.
 
     Returns
     -------
-        None
+        Tuple[Any, Dict[str, Any], Dict[str, float],float,float,float,float] \nA Tuple returning the best model,hyperparameters, performance metrics and the scores on the testing dataset.
 
 
     """
@@ -306,16 +307,18 @@ def find_best_model(X_test,y_test):
     return best_model,best_hyperparameters,performance_metrics,test_accuracy_score,test_precision_score,test_recall_score,test_f1_score
 
 
-def plot_models(models:List, X_val:np.ndarray = None, y_val:np.ndarray = None, scores:List[float]=None, file_path:str=None):
+def plot_models(models:List, X_val:pd.DataFrame = None, y_val:pd.Series = None, scores:List[float]=None, file_path:str=None):
     """
-    Plot a bar chart comparing different models based on their performance scores.
+    Plot a bar chart comparing different models based on their performance scores or Plot a confusion matrix if a single model is passed as an argument.
 
     Parameters
     ----------
 
-        model : (list) \n
-        score : (dict) \n
-        title : (string) \n
+        models : (list) \nList of Models.
+        X_val : (pd.DataFrame) \n Validation Features.
+        y_val : (pd.Series) \n Validation Series. 
+        score : (dict) \nScores(Validation Accuracy) of the Models.
+        file_path : (string) \nPath where the plot is to be saved.
 
     Return
     ------
@@ -404,7 +407,6 @@ def main():
     """
     # Load and preprocess data
     df = pd.read_csv('airbnb-property-listing/tabular_data/clean_listing.csv')
-    print(df['Category'].unique())
     X, y = load_airbnb(df, label='Category')
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y)
     
@@ -415,7 +417,7 @@ def main():
     #print(f"\n Initial Logistic Regression Performance Metrics:\n\t Test Accuracy: {performance_metrics['test_accuracy']}\n\t Test Precision: {performance_metrics['test_precision']}\n\t Test Recall: {performance_metrics['test_recall']}\n\t Test f1: {performance_metrics['test_f1']}")
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y,train_size=0.65)
     # Evaluate various models using hyperparameter tuning and save results
-    # evaluate_all_models(X_train, y_train, X_val, y_val)
+    evaluate_all_models(X_train, y_train, X_val, y_val)
 
     # Find the best model and print its hyperparameters and performance
     best_model, best_hyperparameters, performance_metrics, test_accuracy_score, test_precision_score, test_recall_score, test_f1_score = find_best_model(X_test,y_test)
