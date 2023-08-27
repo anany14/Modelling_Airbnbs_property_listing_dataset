@@ -130,6 +130,9 @@ The `modelling.py` module focuses on building and evaluating regression models t
 
 8. **Plotting Data:** The `plot_all_models` function plots either a comparison of different models using scatterplots or the total performance if a single model is provided.
 
+9. **Running all the functions:** : the `main` function runs the functions in the correct order.
+
+
 #### Model Selection and Metrics
 
 In the file `modelling.py`, we evaluated several regression models:

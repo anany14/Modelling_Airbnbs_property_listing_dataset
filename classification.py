@@ -360,7 +360,7 @@ def plot_models(models:List, X_val:np.ndarray = None, y_val:np.ndarray = None, s
 
     if len(models) == 1:
         model = models[0]
-        class_names = ["Class 0", "Class 1", "Class 2", "Class 3", "Class 4"]
+        class_names = ['Treehouses','Chalets','Amazing pools','Offbeat','Beachfront']
 
         plt.figure(figsize=(12, 6))
 
@@ -375,8 +375,8 @@ def plot_models(models:List, X_val:np.ndarray = None, y_val:np.ndarray = None, s
         tick_marks = np.arange(len(class_names))
         plt.xticks(tick_marks, class_names, rotation=45)
         plt.yticks(tick_marks, class_names)
-        plt.xlabel("Predicted Value")
-        plt.ylabel("Actual Value")
+        plt.xlabel("Predicted Value for Categories")
+        plt.ylabel("Actual Value for Categories")
 
         plt.tight_layout()
 
@@ -404,6 +404,7 @@ def main():
     """
     # Load and preprocess data
     df = pd.read_csv('airbnb-property-listing/tabular_data/clean_listing.csv')
+    print(df['Category'].unique())
     X, y = load_airbnb(df, label='Category')
     X_train, y_train, X_test, y_test, X_val, y_val = split_X_y(X, y)
     
