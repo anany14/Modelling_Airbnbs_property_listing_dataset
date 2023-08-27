@@ -122,11 +122,13 @@ The `modelling.py` module focuses on building and evaluating regression models t
 
 4. **Hyperparameter Tuning with GridSearchCV:** The `tune_regression_model_hyperparameters` function uses GridSearchCV for hyperparameter tuning, allowing us to explore a wider range of hyperparameter values for different regression models.
 
-5. **Model Evaluation and Selection:** The `evaluate_all_models` function evaluates multiple regression models (Linear Regression, Decision Tree, Random Forest, Gradient Boosting) by tuning their hyperparameters. The best model is selected based on validation RMSE, and the trained models are saved along with their performance metrics.
+5. **Save Model:** The `save_model` function saves a regression model, its hyperparameters and performance metrics in the folder of choice.
 
-6. **Finding the Best Model:** The `find_best_model` function identifies the best-performing model based on the saved validation RMSE values from the earlier model evaluations.
+6. **Model Evaluation and Selection:** The `evaluate_all_models` function evaluates multiple regression models (Linear Regression, Decision Tree, Random Forest, Gradient Boosting) by tuning their hyperparameters. The best model is selected based on validation RMSE, and the trained models are saved along with their performance metrics.
 
-7. **Plotting Data:** The `plot_all_models` function plots either a comparison of different models using scatterplots or the total performance if a single model is provided.
+7. **Finding the Best Model:** The `find_best_model` function identifies the best-performing model based on the saved validation RMSE values from the earlier model evaluations.
+
+8. **Plotting Data:** The `plot_all_models` function plots either a comparison of different models using scatterplots or the total performance if a single model is provided.
 
 #### Model Selection and Metrics
 
@@ -148,7 +150,10 @@ The best model based on the validation RMSE is the chosen model for making predi
 
 2. **R-squared (R2) Score**: A measure of how well the model explains the variance in the target variable. Higher R2 score indicates a better fit to the data.
 
-![This is the Model performance of the LinearRegression class without tuning the hyperparameters](plots/regression/sgdregression_without_hyperparameters.png)
+<figure>
+  <img src="plots/regression/sgdregression_without_hyperparameters.png" alt="This is the Model performance of the LinearRegression class without tuning the hyperparameters">
+  <figcaption>Figure 1: This is the Model performance of the LinearRegression class without tuning the hyperparameters</figcaption>
+</figure>
 
 ### Model Performance Metrics 
 
@@ -177,7 +182,10 @@ The best model based on the validation RMSE is the chosen model for making predi
     - validation_r2: 0.11430983256579175
 
 
-![Comparison Plot](plots/regression/model_comparison.png)
+<figure>
+  <img src="plots/regression/model_comparison.png" alt="This comparison Plot is between 4 regression models and is made to choose the best model">
+  <figcaption>Figure 2: This comparison Plot is between 4 regression models and is made to choose the best model</figcaption>
+</figure>
 
 
 ### Best Model 
@@ -185,7 +193,11 @@ The best model based on the validation RMSE is the chosen model for making predi
 - The best model and it's best hyperparameters to fit the data is `GradientBoostingRegressor(learning_rate=0.01, n_estimators=300, random_state=42)`
 - The RMSE on the testing dataset is `131.073797`
 
-![Best Model Performance](plots/regression/best_model.png)
+<figure>
+    <img src = "plots/regression/best_model.png" alt=" Best Model Performance">
+    <figcaption>Figure 3: Best Model Performance</figcaption>
+<figure>
+
 
 ### Further Experiments
 
@@ -201,19 +213,117 @@ While we have explored a variety of regression models and performed hyperparamet
 
 5. **Handling Outliers**: Exploring techniques to handle outliers in the data may improve the robustness of our models.
 
-## Classification Modellig 
+## Classification Modelling 
 
 
+The file `classification.py` is dedicated to constructing and assessing classification models for predicting specific outcomes in the Airbnb property listings dataset.
+
+1. **Data Preparation and Splitting:** The `_split_X_y` function readies the dataset for model training, validation, and testing by approprimately splitting it.
+
+2. **Initial Model Training:** The `train_logistic_model` function trains a baseline classification model (default is Logistic Regression) and provides an overview of its performance on the training and test sets.
+
+3. **Hyperparameter Tuning with GridSearchCV:** The `tune_classification_model_hyperparameters` uses GridSearchCV to fine-tune hyperparameters, allowing for an exhaustive exploration of parameter space for various classification models.
+
+4. **Save Model:** The `save_model` function saves a regression model, its hyperparameters and performance metrics in the folder of choice.
+
+5. **Model Evaluation and Selection**: The `evaluate_all_models` function assesses multiple classification models (Logistic Regression, Decision Tree, Random Forest, Gradient Boosting) by optimizing their hyperparameters. The selection of the best model is guided by validation accuracy, and the trained models, along with their performance metrics, are saved.
+
+6. **Identifying the Optimal Model:** The `find_best_model` function determines the highest-performing model based on validation accuracy scores from prior evaluations.
+
+7. **Visualizing Results:** The `plot_models` function generates visualization plots, depicting either a comparative analysis of different models  or the comprehensive performance of a single model.
+
+8. **Running all the functions:** : the `main` function runs the functions in the correct order.
+
+#### Model Selection and Metrics
+
+Within the `classification.py` file, a range of classification models were evaluated:
+
+**Logistic Regression:** A fundamental classification algorithm suitable for binary classification tasks.
+
+**Decision Tree Classifier:** A model based on decision tree principles that can capture complex decision boundaries.
+
+**Random Forest Classifier:** An ensemble model combining multiple decision trees for enhanced predictive accuracy.
+
+**Gradient Boosting Classifier:** A boosting algorithm that amalgamates weak learners into a robust predictive model.
+
+### Model Performance Assessment
+
+The optimal model, chosen based on validation accuracy, serves as the primary predictor for new data. The primary evaluation metrics encompass:
+
+**Validation Accuracy:** Measures the ratio of correctly predicted instances in the validation set. Higher accuracy indicates better model performance.
+
+**Precision, Recall, F1-Score:** These metrics gauge the classifier's performance concerning true positive rate, positive predictive value, and balance between precision and recall.
+
+<figure>
+  <img src="plots\classification\logisticclassification_confusion_wo_hyperparameters.png" alt="This is the Confusion Matrix for the LogisticRegression class without tuning the hyperparameters">
+  <figcaption>Figure 4: This is the Confusion Matrix for the LogisticRegression class without tuning the hyperparameters</figcaption>
+</figure>
+
+### Model Performance Metrics
+
+- **Logistic Regression:**
+    - Best Hyperparameters: {"max_iter": 10000,"penalty": null,"solver": "saga"}
+    - "training_accuracy": 0.962050625430907,
+    - "validation_accuracy": 0.9662921348314607,
+    - "validation_precision": 0.9662921348314607,
+    - "validaiton_recall": 0.9662921348314607,
+    - "validation_f1": 0.9662921348314607
+
+- **GradientBoosting Classifier:**
+    - {"criterion": "friedman_mse","learning_rate": 0.01,"max_depth": 3,"n_estimators": 50}
+    - "training_accuracy": 0.9915886929971437,
+    - "validation_accuracy": 0.9887640449438202,
+    - "validation_precision": 0.9887640449438202,
+    - "validaiton_recall": 0.9887640449438202,
+    - "validation_f1": 0.9887640449438202
+
+- **RandomForset Classifier:**
+    - {"criterion": "entropy","max_depth": null,"min_samples_leaf": 1,"min_samples_split": 2,"n_estimators": 300}
+    - "training_accuracy": 0.9831773859942874,
+    - "validation_accuracy": 0.9887640449438202,
+    - "validation_precision": 0.9887640449438202,
+    - "validaiton_recall": 0.9887640449438202,
+    - "validation_f1": 0.9887640449438202
+
+- **DecisionTree Classifiers:**
+    - {"criterion": "gini","max_depth": null,"min_samples_leaf": 1,"min_samples_split": 2,"splitter": "best"}
+    - "training_accuracy": 0.9915886929971437,
+    - "validation_accuracy": 0.9887640449438202,
+    - "validation_precision": 0.9887640449438202,
+    - "validaiton_recall": 0.9887640449438202,
+    - "validation_f1": 0.9887640449438202
+
+<figure>
+  <img src="plots\classification\classification_models_comparison.png" alt="This comparison Plot is between 4 classification models and is made to choose the best model">
+  <figcaption>Figure 5: This comparison Plot is between 4 classification models and is made to choose the best model</figcaption>
+</figure>
 
 
+### Best Model 
+
+- The best model and it's best hyperparameters to fit the data is `DecisionTree Classifier('criterion'= 'gini', 'max_depth'= None, 'min_samples_leaf'= 1, 'min_samples_split'=2, 'splitter'='best')`
+
+- The Accuracy on the testing dataset is `0.9935897435897436`
+
+<figure>
+    <img src = "plots\classification\best_model_confusion_matrix.png" alt=" Best Model Confusion Matrix">
+    <figcaption>Figure 6: Best Model Confusion Matrix</figcaption>
+<figure>
 
 
+### Further Experiments
 
+While the exploration of various classification models and hyperparameter tuning was conducted, further avenues for experimentation include:
 
+**Feature Engineering:** Experimentation with creating novel features can be pursued to potentially enhance model performance.
 
+**Advanced Ensemble Techniques:** Exploration of advanced ensemble models like XGBoost and LightGBM could lead to superior results.
 
+**Cross-Validation Strategies:** Adoption of sophisticated cross-validation methodologies may enhance the robustness of model evaluation.
 
+**Fine-Tuning Hyperparameters:** More exhaustive hyperparameter tuning via Bayesian optimization could yield optimal results.
 
+**Handling Imbalanced Data:** Techniques for addressing imbalanced classes can contribute to improved model performance.
 
 
 ## Contributing
