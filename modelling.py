@@ -547,36 +547,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-"""
-
-        Hyperparameters for regression models
-    ---------------
-
-    \t``SGDRegressor`` - 
-    \n``alpha``: This controls the regularization strength. Start with a small value like 0.0001 and gradually increase if needed.
-    \n``max_iter``: The maximum number of iterations. A larger value, such as 1000, should be a reasonable starting point.
-    \n``tol``: The tolerance for stopping criteria. You can start with 1e-3.
-    
-    \t``DecisionTreeRegressor`` - 
-    \n``max_depth``: Maximum depth of the tree. Start with None (no depth limit) and then try smaller values like 5, 3, or 1.
-    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
-    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
-
-    \t``RandomForestRegressor`` - 
-    \n``n_estimators``: The number of trees in the forest. Start with a moderate number, such as 100, and tune from there.
-    \n``max_depth``: Maximum depth of the individual trees. Similar to the decision tree, start with None.
-    \n``min_samples_split``: Minimum number of samples required to split an internal node. Start with 2.
-    \n``min_samples_leaf``: Minimum number of samples required to be at a leaf node. Start with 1.
-
-    \t``GradientBoostingRegressor`` -
-    \n``n_estimators``: The number of boosting stages (trees). Start with 100 or 150.
-    \n``max_depth``: Maximum depth of the individual trees. Start with a smaller value like 3 or 5.
-    \n``learning_rate``: The step size shrinkage used to prevent overfitting. Start with 0.1
-
-"""
