@@ -17,6 +17,7 @@ This project leverages several essential frameworks and tools to achieve its goa
 - [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) - Grid search for hyperparameter tuning.
 - [MinMaxScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) - Feature scaling.
 - [Matplotlib](https://matplotlib.org/stable/index.html) - Plotting graphs, charts etc., in Python.
+- [TensorBoard](https://www.tensorflow.org/tensorboard) - Tool for visualizing training and performance metrics of neural networks.
 
 
 ## Getting Started
@@ -55,25 +56,12 @@ Use the Airbnb Model Evaluation Framework to build and evaluate machine learning
 
 3. Run the `classification.py` script to train, tune, and evaluate classification models on the Airbnb dataset for predicting property categories using models like [LogisticRegression], [DecisionTreeClassifier], [RandomForestClassifier], and [GradientBoostingClassifier].
 
-4. Both the scripts contain functions to plot the performance of different models which are in the folders `plots/regression` and `plots/classification` 
+4. Run the `neural_network.py` script to build and train a neural network model for property price prediction. Details of the architecture and training process are provided below in the `neural_network` section
+
 
 5. 
 
-6. 
 
-
-
-<!---
-
-## Roadmap
-We have some exciting plans for the future of this framework:
-
-- Add support for additional data types and tasks.
-- Enhance the visualization of results.
-- Improve documentation with more usage examples.
-- Introduce multi-language support.
-- Include more configurable neural network architectures.
---->
 
 ## Introduction
 
@@ -218,7 +206,6 @@ While we have explored a variety of regression models and performed hyperparamet
 
 ## Classification Modelling 
 
-
 The file `classification.py` is dedicated to constructing and assessing classification models for predicting specific outcomes in the Airbnb property listings dataset.
 
 1. **Data Preparation and Splitting:** The `_split_X_y` function readies the dataset for model training, validation, and testing by approprimately splitting it.
@@ -327,6 +314,80 @@ While the exploration of various classification models and hyperparameter tuning
 **Fine-Tuning Hyperparameters:** More exhaustive hyperparameter tuning via Bayesian optimization could yield optimal results.
 
 **Handling Imbalanced Data:** Techniques for addressing imbalanced classes can contribute to improved model performance.
+
+
+
+## Neural Network Modeling (neural_network.py)
+
+The `neural_network.py` module focuses on building and assessing a neural network-based model for predicting the price per night of Airbnb property listings. This section provides an overview of the neural network architecture, training process, and model performance evaluation.
+
+### Neural Network Architecture
+
+The neural network architecture employed for this task is a feedforward neural network with the following layers:
+
+1. **Input Layer**: The input layer accepts features extracted from the dataset. The number of input neurons matches the dimensionality of the feature vector.
+
+2. **Hidden Layers**: This neural network contains two hidden layers. The number of neurons in these layers is adjustable, offering flexibility in model complexity.
+
+3. **Output Layer**: The output layer consists of a single neuron, which predicts the price per night.
+
+The activation functions used in the hidden layers are ReLU (Rectified Linear Unit), and a linear activation is used in the output layer, as this is a regression task.
+
+### Training Process
+
+The neural network is trained using the Mean Squared Error (MSE) loss function and the Adam optimizer. The training dataset is split into training and validation sets to monitor training progress and prevent overfitting. The training process encompasses:
+
+1. **Forward Pass**: Input data is propagated forward through the network, resulting in predictions.
+
+2. **Loss Computation**: The MSE loss between the predicted prices and actual prices is calculated.
+
+3. **Backpropagation**: Gradients of the loss with respect to the network's weights and biases are computed.
+
+4. **Weight Updates**: The Adam optimizer is employed to update the model's weights and biases, minimizing the loss.
+
+5. **Training Metrics**: Training and validation metrics, such as Root Mean Squared Error (RMSE) and R-squared, are logged using TensorBoard for analysis and visualization.
+
+### TensorBoard Visualization
+
+Below, you'll find screenshots of training and performance metrics obtained using TensorBoard. These images present all the neural network models trained, facilitating comparison.
+
+<figure>
+  <img src="path/to/your/image.png" alt="Description of the image">
+  <figcaption>Figure: Description of the image</figcaption>
+</figure>
+
+
+### Best Model Selection
+
+The best-performing neural network model is chosen based on evaluation metrics such as RMSE and R-squared. This model becomes the primary predictor for new data.
+
+#### Training and Performance of the Best-Parameterized Neural Network
+
+we highlight the training and performance characteristics of the best-parameterized neural network.
+
+<figure>
+  <img src="path/to/your/image.png" alt="Description of the image">
+  <figcaption>Figure: Description of the image</figcaption>
+</figure>
+
+
+
+### Further Experimentation
+
+While this neural network-based approach demonstrates its effectiveness, avenues for further experimentation include:
+
+- **Architecture Exploration**: Experimenting with different neural network architectures (e.g., more hidden layers, different activation functions) could potentially yield improved performance.
+
+- **Hyperparameter Tuning**: Fine-tuning hyperparameters, such as learning rate and the number of neurons in hidden layers, can enhance model generalization.
+
+- **Feature Engineering**: Exploring additional features or feature transformations may lead to better predictive power.
+
+- **Regularization Techniques**: Implementing dropout layers or L1/L2 regularization can help prevent overfitting.
+
+- **Data Augmentation**: For image or text data, data augmentation techniques can be applied to increase the size and diversity of the training dataset.
+
+- **Transfer Learning**: Leveraging pre-trained neural networks (e.g., using transfer learning with models like BERT or ResNet) may be beneficial for specific data types.
+
 
 
 ## Contributing
