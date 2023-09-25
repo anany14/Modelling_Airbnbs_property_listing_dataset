@@ -336,7 +336,7 @@ The neural network architecture employed for this task is a feedforward neural n
 The activation functions used in the hidden layers are ReLU (Rectified Linear Unit), and a linear activation is used in the output layer, as this is a regression task.
 
 <figure>
-  <img src="plots\neural_network\neural_network.pmg.png" alt="Visual Representation of the neural network used">
+  <img src="plots\neural_network\neural_network.png" alt="Visual Representation of the neural network used">
   <figcaption>Figure 7: Visual Representation of the neural network used</figcaption>
 </figure>
 

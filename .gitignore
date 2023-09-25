@@ -1,2 +1,4 @@
 #ignoring the test file
 test_airbnb.ipynb
+runs
+__pycache__
