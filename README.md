@@ -317,7 +317,9 @@ While the exploration of various classification models and hyperparameter tuning
 
 
 
-## Neural Network Modeling (neural_network.py)
+## Neural Network Modeling 
+
+### neural_network.py 
 
 The `neural_network.py` module focuses on building and assessing a neural network-based model for predicting the price per night of Airbnb property listings. This section provides an overview of the neural network architecture, training process, and model performance evaluation.
 
@@ -332,6 +334,12 @@ The neural network architecture employed for this task is a feedforward neural n
 3. **Output Layer**: The output layer consists of a single neuron, which predicts the price per night.
 
 The activation functions used in the hidden layers are ReLU (Rectified Linear Unit), and a linear activation is used in the output layer, as this is a regression task.
+
+<figure>
+  <img src="plots\neural_network\neural_network.pmg.png" alt="Visual Representation of the neural network used">
+  <figcaption>Figure 7: Visual Representation of the neural network used</figcaption>
+</figure>
+
 
 ### Training Process
 
@@ -352,24 +360,57 @@ The neural network is trained using the Mean Squared Error (MSE) loss function a
 Below, you'll find screenshots of training and performance metrics obtained using TensorBoard. These images present all the neural network models trained, facilitating comparison.
 
 <figure>
-  <img src="path/to/your/image.png" alt="Description of the image">
-  <figcaption>Figure: Description of the image</figcaption>
+  <img src="plots\neural_network\all_training.png" alt="Training Loss Comparison on tensor board">
+  <figcaption>Figure 8: Training Loss comparison on tensor board</figcaption>
 </figure>
 
-
-### Best Model Selection
+#### Best Model Selection
 
 The best-performing neural network model is chosen based on evaluation metrics such as RMSE and R-squared. This model becomes the primary predictor for new data.
 
-#### Training and Performance of the Best-Parameterized Neural Network
+##### Training and Performance of the Best-Parameterized Neural Network
 
 we highlight the training and performance characteristics of the best-parameterized neural network.
 
-<figure>
-  <img src="path/to/your/image.png" alt="Description of the image">
-  <figcaption>Figure: Description of the image</figcaption>
-</figure>
+The best hyperparameters are: **{"optimiser": "Adam",    "learning_rate": 0.01,    "hidden_layer_width": 14,    "dropout": 0.3}**
 
+The performance Metrics are:
+
+- **RMSE_loss:**
+  - training: 124.59336711338588,
+  - validation: 110.78561940193177,
+  - test: 103.47922897338867
+
+- **R_squared:**
+  - training: -0.44029965279979216,
+  - validation: -0.21042106234974128,
+  - test: -0.15234398737420637
+
+- **training_duration:** 1.9368557929992676,
+- **inference_latency:** 0.0005652904510498047
+
+
+### Neural Network Reuse
+
+I use the same model to predict the number of bedrooms (label) with now the price per night and category added as the feature. 
+
+#### Best Model Selection
+
+The best hyperparameters are: **{"optimiser": "Adam",   "learning_rate": 0.01,    "hidden_layer_width": 16,     "dropout": 0.2}**
+
+The performance Metrics are:
+
+- **RMSE_loss:** 
+  - training: 0.5968235479933875,
+  - validation: 0.6249525301158428,
+  - test: 0.5783892912524087
+- **R_squared:** 
+ - "training": 0.3597391373234516,
+ - "validation": 0.5396837752895906,
+ - "test": 0.72882003991113
+
+- **training_duration:** 2.0305659770965576,
+- **inference_latency:** 0.0004209109715053013
 
 
 ### Further Experimentation
@@ -382,7 +423,7 @@ While this neural network-based approach demonstrates its effectiveness, avenues
 
 - **Feature Engineering**: Exploring additional features or feature transformations may lead to better predictive power.
 
-- **Regularization Techniques**: Implementing dropout layers or L1/L2 regularization can help prevent overfitting.
+- **Regularization Techniques**: Implementing L1/L2 regularization can help prevent overfitting.
 
 - **Data Augmentation**: For image or text data, data augmentation techniques can be applied to increase the size and diversity of the training dataset.
 

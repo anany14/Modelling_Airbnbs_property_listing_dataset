@@ -211,7 +211,7 @@ def train(train_loader: DataLoader, validation_loader: DataLoader, config: dict,
             rmse_loss = torch.sqrt(train_loss)
             train_rmse_loss += rmse_loss.item()
             train_r2 = r2_score(y_train.detach().numpy(), train_prediction.detach().numpy())
-            writer.add_scalar('training_r2', train_r2, batch_idx)
+            #writer.add_scalar('training_r2', train_r2, batch_idx)
             training_r2 += train_r2
 
         for batch in validation_loader:
@@ -226,7 +226,7 @@ def train(train_loader: DataLoader, validation_loader: DataLoader, config: dict,
             rmse_loss = torch.sqrt(val_loss)
             val_rmse_loss += rmse_loss.item()
             val_r2 = r2_score(y_val.detach().numpy(), val_prediction.detach().numpy())
-            writer.add_scalar('validation_r2', val_r2, batch_idx)
+            #writer.add_scalar('validation_r2', val_r2, batch_idx)
             validation_r2 += val_r2
 
     end_time = time.time()
@@ -273,7 +273,7 @@ def test_model(model: NN, test_loader: DataLoader) -> Tuple[float, float, float]
         rmse_loss = torch.sqrt(test_loss)
         test_rmse_loss += rmse_loss.item()
         test_r2 = r2_score(y_test.detach().numpy(), test_prediction.detach().numpy())
-        writer.add_scalar("test_r2", test_r2, batch_idx)
+        #writer.add_scalar("test_r2", test_r2, batch_idx)
         testing_r2 += test_r2
         total_pred_time += (pred_end_time - pred_start_time)
         batch_idx += 1
@@ -355,6 +355,7 @@ def find_best_nn() -> None:
                 "inference_latency": inference_latency
             }
 
+    print(f"Best Model is {best_model},\t {performance_metrics}")
     save_model(best_model, best_hyperparameters, performance_metrics)
 
 
